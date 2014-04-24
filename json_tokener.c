@@ -553,8 +553,12 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
                 }
 
 		if (tok->ucs_char < 0x80) {
-		  unescaped_utf[0] = tok->ucs_char;
-		  printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 1);
+                    if (tok->ucs_char) {
+		      unescaped_utf[0] = tok->ucs_char;
+		      printbuf_memappend_fast(tok->pb, (char*)unescaped_utf, 1);
+                    } else {
+		      printbuf_memappend_fast(tok->pb, "\\u0000", 6);
+                    }
 		} else if (tok->ucs_char < 0x800) {
 		  unescaped_utf[0] = 0xc0 | (tok->ucs_char >> 6);
 		  unescaped_utf[1] = 0x80 | (tok->ucs_char & 0x3f);
